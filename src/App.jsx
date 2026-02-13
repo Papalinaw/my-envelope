@@ -2,9 +2,30 @@ import React, { useState, useRef } from 'react';
 import { motion, useMotionValue, useTransform, useSpring, AnimatePresence } from 'framer-motion';
 
 const App = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    
+    // Validation logic for empty fields
+    if (!username || !password) {
+      setError('Please enter your username and password, mahal.');
+      return;
+    }
+
+    if (username === 'zhiiijumlaie' && password === 'sexylove') {
+      setIsAuthenticated(true);
+      setError('');
+    } else {
+      setError('Incorrect username or password, mahal.');
+    }
+  };
+
+  // --- Envelope Logic ---
   const [isOpen, setIsOpen] = useState(false);
-  
-  // 3D Tilt Logics
   const ref = useRef(null);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -17,8 +38,7 @@ const App = () => {
   const springRotateY = useSpring(rotateY, springConfig);
 
   const handleMouseMove = (e) => {
-    if (isOpen) return; 
-    
+    if (isOpen || !ref.current) return; 
     const rect = ref.current.getBoundingClientRect();
     const width = rect.width;
     const height = rect.height;
@@ -45,64 +65,26 @@ const App = () => {
   };
 
   // 🎬 Animation Variants
-
   const envelopeVariants = {
-    closed: { 
-      rotateX: 0, 
-      rotateY: 0,
-      z: 0,
-      y: 0 
-    },
-    open: { 
-      rotateX: 0,
-      rotateY: 0,
-      z: 0,     
-      y: 400,    // Ibaba pa lalo ang envelope dahil sobrang haba na ng paper
-      transition: { duration: 1.5, ease: "easeInOut" }
-    }
+    closed: { rotateX: 0, rotateY: 0, z: 0, y: 0 },
+    // ADJUSTED: Ibinalik ko sa 350 (mula 450) para hindi masyadong mababa ang envelope
+    open: { rotateX: 0, rotateY: 0, z: 0, y: 350, transition: { duration: 1.5, ease: "easeInOut" } }
   };
 
   const flapVariants = {
-    closed: { 
-      rotateX: 0,
-      transition: { duration: 0.6, ease: [0.4, 0, 0.2, 1] } 
-    },
-    open: { 
-      rotateX: 180,
-      transition: { duration: 0.8, ease: [0.4, 0, 0.2, 1], delay: 0.2 } 
-    }
+    closed: { rotateX: 0, transition: { duration: 0.6, ease: [0.4, 0, 0.2, 1] } },
+    open: { rotateX: 180, transition: { duration: 0.8, ease: [0.4, 0, 0.2, 1], delay: 0.2 } }
   };
 
   const letterVariants = {
-    closed: { 
-      x: "-50%", 
-      y: 0,      
-      z: 2, 
-      scale: 0.9,
-      opacity: 0,
-      transition: { duration: 0.4 }
-    },
-    open: { 
-      x: "-50%", 
-      y: -300,   // Itaas pa lalo ang slide para lumabas ang dulo ng papel
-      z: 80,     
-      scale: 1,
-      opacity: 1,
-      transition: { 
-        duration: 1.2, 
-        ease: "easeInOut",
-        delay: 0.4 
-      }
-    }
+    closed: { x: "-50%", y: 0, z: 2, scale: 0.9, opacity: 0, transition: { duration: 0.4 } },
+    // ADJUSTED: Ginawang -220 (mula -350) para hindi lumagpas sa taas ng screen
+    open: { x: "-50%", y: -220, z: 80, scale: 1, opacity: 1, transition: { duration: 1.2, ease: "easeInOut", delay: 0.4 } }
   };
 
-  // Staggered Text Reveal
   const textContainerVariants = {
     closed: { opacity: 0 },
-    open: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1, delayChildren: 1.2 }
-    }
+    open: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 1.2 } }
   };
 
   const textItemVariants = {
@@ -133,12 +115,7 @@ const App = () => {
               rotate: 360 
             }}
             exit={{ opacity: 0 }}
-            transition={{ 
-              duration: heart.duration, 
-              delay: heart.delay, 
-              ease: "linear",
-              repeat: 0
-            }}
+            transition={{ duration: heart.duration, delay: heart.delay, ease: "linear", repeat: 0 }}
             style={{
               position: 'fixed',
               left: `${heart.left}%`,
@@ -160,10 +137,10 @@ const App = () => {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Great+Vibes&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Pinyon+Script&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap');
 
         :root {
-          --bg-gradient: radial-gradient(circle at center, #f5f4ef 0%, #e0ddd5 100%);
+          --bg-gradient: radial-gradient(circle at center, #f5f4ef 0%, #d1cfc7 100%);
           --envelope-color: #800000;
           --paper-color: #ffffff;
           --gold-accent: #D4AF37;
@@ -176,7 +153,7 @@ const App = () => {
           width: 100%;
           height: 100%;
           background: var(--bg-gradient);
-          font-family: 'Cormorant Garamond', serif;
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
           overflow: hidden;
         }
 
@@ -189,6 +166,133 @@ const App = () => {
           perspective: 1200px;
         }
 
+        /* Ambient Blobs */
+        .ambient-blob {
+          position: absolute;
+          border-radius: 50%;
+          filter: blur(60px);
+          opacity: 0.6;
+          z-index: 1;
+          animation: floatBlob 10s infinite alternate ease-in-out;
+        }
+
+        .blob-1 {
+          top: 20%;
+          left: 20%;
+          width: 300px;
+          height: 300px;
+          background: #800000;
+        }
+
+        .blob-2 {
+          bottom: 20%;
+          right: 20%;
+          width: 250px;
+          height: 250px;
+          background: #D4AF37;
+          animation-delay: -5s;
+        }
+
+        @keyframes floatBlob {
+          0% { transform: translate(0, 0) scale(1); }
+          100% { transform: translate(20px, -20px) scale(1.1); }
+        }
+
+        /* --- iPhone Style Glass Login --- */
+        .login-container {
+          background: rgba(255, 255, 255, 0.4);
+          backdrop-filter: blur(24px) saturate(180%);
+          -webkit-backdrop-filter: blur(24px) saturate(180%);
+          border: 1px solid rgba(255, 255, 255, 0.6);
+          box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+          
+          padding: 40px 30px;
+          border-radius: 32px;
+          text-align: center;
+          max-width: 340px;
+          width: 85%;
+          z-index: 100;
+          position: relative;
+        }
+
+        .login-title {
+          font-family: 'Pinyon Script', cursive;
+          font-size: 2.8rem;
+          color: #4a0000;
+          margin-bottom: 20px;
+          text-shadow: 0 1px 2px rgba(255,255,255,0.8);
+          letter-spacing: 1px;
+        }
+
+        .input-group {
+          margin-bottom: 20px;
+          text-align: left;
+        }
+
+        .input-group label {
+          display: block;
+          font-size: 0.9rem;
+          color: #333;
+          margin-bottom: 8px;
+          font-weight: 500;
+          padding-left: 8px;
+          font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        .input-group input {
+          width: 100%;
+          padding: 16px;
+          background: rgba(255, 255, 255, 0.7);
+          border: 1px solid rgba(255, 255, 255, 0.5);
+          border-radius: 18px;
+          font-size: 1.05rem;
+          color: #1a1a1a;
+          box-sizing: border-box;
+          transition: all 0.3s ease;
+        }
+
+        .input-group input:focus {
+          background: rgba(255, 255, 255, 0.95);
+          border-color: #800000;
+          box-shadow: 0 0 0 4px rgba(128, 0, 0, 0.1);
+          outline: none;
+        }
+
+        .login-btn {
+          width: 100%;
+          /* MODIFIED: Red Gradient Background */
+          background: linear-gradient(135deg, #ff4d4d 0%, #b71c1c 100%);
+          color: white;
+          border: none;
+          padding: 18px;
+          font-size: 1.05rem;
+          font-weight: 600;
+          border-radius: 18px;
+          cursor: pointer;
+          transition: transform 0.2s, box-shadow 0.2s;
+          letter-spacing: 0.02em;
+          margin-top: 10px;
+          font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+          /* Added shadow for depth */
+          box-shadow: 0 8px 20px rgba(183, 28, 28, 0.3);
+        }
+
+        .login-btn:hover {
+          transform: scale(0.98);
+          box-shadow: 0 4px 10px rgba(183, 28, 28, 0.2);
+        }
+
+        .error-msg {
+          background: rgba(255, 59, 48, 0.1);
+          color: #ff3b30;
+          padding: 12px;
+          border-radius: 12px;
+          font-size: 0.9rem;
+          margin-bottom: 20px;
+          font-weight: 500;
+        }
+
+        /* --- Envelope Styles --- */
         .scene {
           position: relative;
           width: 340px;
@@ -220,19 +324,19 @@ const App = () => {
           bottom: 0; 
           transform-style: preserve-3d;
           
-          /* ADJUSTED: Ginawa kong 550px ang height */
           width: 320px;
-          height: 550px; 
+          height: 600px; 
           background: var(--paper-color);
           border-radius: 4px;
           display: flex;
           flex-direction: column;
           align-items: center;
           text-align: center;
-          padding: 35px 25px;
+          padding: 30px 25px;
           box-sizing: border-box;
           box-shadow: 0 5px 15px rgba(0,0,0,0.15);
           border: 1px solid rgba(212, 175, 55, 0.2);
+          font-family: 'Playfair Display', serif;
         }
 
         .layer-letter::after {
@@ -245,21 +349,21 @@ const App = () => {
         }
 
         h1 {
-          font-family: 'Great Vibes', cursive;
-          font-size: 2rem;
-          margin: 0 0 15px 0;
-          color: #333;
+          font-family: 'Pinyon Script', cursive;
+          font-size: 2.2rem;
+          margin: 0 0 10px 0;
+          color: #1a1a1a;
           line-height: 1;
+          font-weight: 400;
         }
 
-        /* Message body styling */
         .message-body {
-          font-size: 0.95rem; 
+          font-size: 0.85rem;
           line-height: 1.5;
           color: #2c2c2c;
           display: flex;
           flex-direction: column;
-          gap: 15px; 
+          gap: 10px;
           width: 100%;
         }
 
@@ -268,11 +372,18 @@ const App = () => {
         }
 
         .highlight {
-          font-weight: 600;
+          font-family: 'Pinyon Script', cursive;
+          font-size: 1.5rem;
           color: #800000;
-          margin-top: 15px !important;
-          font-size: 1.1rem;
-          font-family: 'Great Vibes', cursive;
+          margin-top: 8px !important;
+          line-height: 1.2;
+        }
+
+        .apple-emoji-text {
+          width: 18px;
+          height: 18px;
+          vertical-align: text-bottom;
+          margin-left: 4px;
         }
 
         .layer-front {
@@ -347,84 +458,133 @@ const App = () => {
       `}</style>
 
       <AnimatePresence>
-        {isOpen && <FallingHearts />}
+        {isAuthenticated && isOpen && <FallingHearts />}
       </AnimatePresence>
 
-      <div className="scene">
-        <motion.div 
-          ref={ref}
-          className="envelope-3d"
-          onClick={toggleEnvelope}
-          onMouseMove={handleMouseMove}
-          onMouseLeave={handleMouseLeave}
-          style={{
-            rotateX: isOpen ? 0 : springRotateX,
-            rotateY: isOpen ? 0 : springRotateY,
-          }}
-          variants={envelopeVariants}
-          animate={isOpen ? "open" : "closed"}
-        >
-          
-          <div className="layer-back" />
+      {!isAuthenticated ? (
+        <>
+          <div className="ambient-blob blob-1"></div>
+          <div className="ambient-blob blob-2"></div>
 
-          {/* The Letter */}
           <motion.div 
-            className="layer-letter"
-            variants={letterVariants}
-            initial="closed"
+            initial={{ opacity: 0, scale: 0.9 }} 
+            animate={{ opacity: 1, scale: 1 }} 
+            transition={{ duration: 0.5 }}
+            className="login-container"
+          >
+            <div className="login-title">Login to open envelope</div>
+            
+            <form onSubmit={handleLogin}>
+              <div className="input-group">
+                <label>Username</label>
+                <input 
+                  type="text" 
+                  value={username} 
+                  onChange={(e) => setUsername(e.target.value)} 
+                  placeholder="Enter username"
+                />
+              </div>
+              <div className="input-group">
+                <label>Password</label>
+                <input 
+                  type="password" 
+                  value={password} 
+                  onChange={(e) => setPassword(e.target.value)} 
+                  placeholder="Enter password"
+                />
+              </div>
+              {error && <div className="error-msg">{error}</div>}
+              <button type="submit" className="login-btn">Unlock My Heart</button>
+            </form>
+          </motion.div>
+        </>
+      ) : (
+        <motion.div 
+          initial={{ opacity: 0 }} 
+          animate={{ opacity: 1 }} 
+          transition={{ duration: 1 }}
+          className="scene"
+        >
+          <motion.div 
+            ref={ref}
+            className="envelope-3d"
+            onClick={toggleEnvelope}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
+            style={{
+              rotateX: isOpen ? 0 : springRotateX,
+              rotateY: isOpen ? 0 : springRotateY,
+            }}
+            variants={envelopeVariants}
             animate={isOpen ? "open" : "closed"}
           >
-            <motion.div
-              variants={textContainerVariants}
+            
+            <div className="layer-back" />
+
+            {/* The Letter */}
+            <motion.div 
+              className="layer-letter"
+              variants={letterVariants}
               initial="closed"
               animate={isOpen ? "open" : "closed"}
-              style={{ width: '100%' }}
             >
-              <motion.h1 variants={textItemVariants}>Happy Valentine’s Day!</motion.h1>
-              
-              <div className="message-body">
-                <motion.p variants={textItemVariants}>
-                  Hi baby, I just want to say that I love you and I’m always grateful for having you in my life.
-                </motion.p>
-                <motion.p variants={textItemVariants}>
-                  Kahit hindi tayo magkasama ngayong Valentine’s, sana next year magkasama na tayong mag-celebrate.
-                </motion.p>
-                <motion.p variants={textItemVariants}>
-                  For now, ito muna ang paraan ko para maiparamdam sa’yo ang love ko. Isipin mo na lang na ako yung bouquet 💐
-                </motion.p>
-                <motion.p variants={textItemVariants}>
-                  Mahal na mahal kita. Nandito lang ako palagi para sa’yo, naka-support at mamahalin ka 24/7. Miss na miss na kita, uwi ka na ha? Hahaha
-                </motion.p>
-                <motion.p variants={textItemVariants} className="highlight">
-                  I love you so much, mahal. Happy Valentine’s Day!
-                </motion.p>
-              </div>
+              <motion.div
+                variants={textContainerVariants}
+                initial="closed"
+                animate={isOpen ? "open" : "closed"}
+                style={{ width: '100%' }}
+              >
+                <motion.h1 variants={textItemVariants}>Happy Valentine’s Day!</motion.h1>
+                
+                <div className="message-body">
+                  <motion.p variants={textItemVariants}>
+                    Hi baby, I just want to say that I love you and I’m always grateful for having you in my life.
+                  </motion.p>
+                  <motion.p variants={textItemVariants}>
+                    Kahit hindi tayo magkasama ngayong Valentine’s, sana next year magkasama na tayong mag-celebrate.
+                  </motion.p>
+                  <motion.p variants={textItemVariants}>
+                    For now, ito muna ang paraan ko para maiparamdam sa’yo ang love ko. Isipin mo na lang na ako yung bouquet 
+                    <img 
+                      src="https://em-content.zobj.net/source/apple/391/bouquet_1f490.png" 
+                      alt="Bouquet" 
+                      className="apple-emoji-text"
+                    />
+                  </motion.p>
+                  <motion.p variants={textItemVariants}>
+                    Mahal na mahal kita. Nandito lang ako palagi para sa’yo, naka-support at mamahalin ka 24/7. Miss na miss na kita, uwi ka na ha? Hahaha
+                  </motion.p>
+                  <motion.p variants={textItemVariants} className="highlight">
+                    I love you so much, mahal. Happy Valentine’s Day!
+                  </motion.p>
+                </div>
 
+              </motion.div>
             </motion.div>
-          </motion.div>
 
-          <div className="layer-front">
-            <svg width="100%" height="100%" viewBox="0 0 340 240" preserveAspectRatio="none">
-              <path d="M0,0 L170,130 L340,0 L340,240 L0,240 Z" fill="#800000" />
-            </svg>
-          </div>
-
-          <motion.div 
-            className="layer-flap"
-            variants={flapVariants}
-            initial="closed"
-            animate={isOpen ? "open" : "closed"}
-          >
-            <svg className="flap-svg" width="100%" height="100%" viewBox="0 0 340 130" preserveAspectRatio="none">
-              <path d="M0,0 L170,130 L340,0 Z" fill="#900000" />
-            </svg>
-            <div className="wax-seal" onClick={toggleEnvelope}>
-              <div className="wax-seal-inner" />
+            <div className="layer-front">
+              <svg width="100%" height="100%" viewBox="0 0 340 240" preserveAspectRatio="none">
+                <path d="M0,0 L170,130 L340,0 L340,240 L0,240 Z" fill="#800000" />
+              </svg>
             </div>
-          </motion.div>
 
+            <motion.div 
+              className="layer-flap"
+              variants={flapVariants}
+              initial="closed"
+              animate={isOpen ? "open" : "closed"}
+            >
+              <svg className="flap-svg" width="100%" height="100%" viewBox="0 0 340 130" preserveAspectRatio="none">
+                <path d="M0,0 L170,130 L340,0 Z" fill="#900000" />
+              </svg>
+              <div className="wax-seal" onClick={toggleEnvelope}>
+                <div className="wax-seal-inner" />
+              </div>
+            </motion.div>
+
+          </motion.div>
         </motion.div>
-      </div>
+      )}
     </>
   );
 };
