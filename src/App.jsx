@@ -4,7 +4,7 @@ import { motion, useMotionValue, useTransform, useSpring, AnimatePresence } from
 const App = () => {
   const [isOpen, setIsOpen] = useState(false);
   
-  // 3D Tilt Logic
+  // 3D Tilt Logics
   const ref = useRef(null);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
