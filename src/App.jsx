@@ -258,6 +258,12 @@ const App = () => {
           outline: none;
         }
 
+        /* Added: Hide placeholder on focus */
+        .input-group input:focus::placeholder {
+          color: transparent;
+          transition: color 0.3s ease;
+        }
+
         .login-btn {
           width: 100%;
           /* MODIFIED: Red Gradient Background */
