@@ -57,7 +57,7 @@ const App = () => {
       rotateX: 0,
       rotateY: 0,
       z: 0,     
-      y: 400,    // Ibaba pa lalo ang envelope dahil sobrang haba na ng papel
+      y: 400,    // Ibaba pa lalo ang envelope dahil sobrang haba na ng paper
       transition: { duration: 1.5, ease: "easeInOut" }
     }
   };
